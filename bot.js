@@ -6,11 +6,6 @@ const SteamTradeOfferManager = require( 'steam-tradeoffer-manager' ); //TradeOff
 
 const client = new SteamUser();
 const community = new SteamCommunity();
-const manager = new SteamTradeOfferManager({
-	steam: client;
-	community: community;
-	language: 'pl'
-});
 
 const logOnOptions = {
 	
