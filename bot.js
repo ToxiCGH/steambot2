@@ -1,5 +1,4 @@
 // Co jest potrzebne do dzialania (moduly)
-const config = require(./config.json)
 const SteamUser = require( 'steam-user' ); 
 const SteamTotp = require( 'steam-totp' ); //"Mobilny" Guard (polecam skorzystac z SDA - Steam Desktop Autchenticator)
 const SteamCommunity = require( 'steamcommunity' ); //SteamCommunity
@@ -15,9 +14,9 @@ const manager = new SteamTradeOfferManager({
 
 const logOnOptions = {
 	
-	accountName: config.username,
-	password: config.password,
-	twoFactorCode: SteamTotp.generateAuthCode(config.sharedSecret)
+	accountName: 'nipmysza9100',
+	password: 'Majkelek20033002123321',
+	twoFactorCode: SteamTotp.generateAuthCode('Ur7cut0Avd2gDm5Mc1LJaFt9Pak=')
 	
 };
 
