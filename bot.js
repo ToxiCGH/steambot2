@@ -1,194 +1,81 @@
-﻿/*
+// Co jest potrzebne do dzialania (moduly)
+const config = require(./config.json)
+const SteamUser = require( 'steam-user' ); 
+const SteamTotp = require( 'steam-totp' ); //"Mobilny" Guard (polecam skorzystac z SDA - Steam Desktop Autchenticator)
+const SteamCommunity = require( 'steamcommunity' ); //SteamCommunity
+const SteamTradeOfferManager = require( 'steam-tradeoffer-manager' ); //TradeOff'y
 
-    BOT został stworzony przez Michała Kornela, pracującego pod pseudonimem "AnotheR"
-    Nikt, bez zgody autora, nie może z niego korzystać!
-
-*/
-//Potrzebne moduly
-const Steam = require('steam');
-const SteamGroups = require('steam-groups');
-const SteamUser = require('steam-user');
-const TradeOfferManager = require('steam-tradeoffer-manager');
-const SteamCommunity = require('steamcommunity');
-const SteamTotp = require('steam-totp');
-
-const steamclient = new Steam.SteamClient();
-const steamGroups = new SteamGroups(steamclient);
 const client = new SteamUser();
 const community = new SteamCommunity();
-const manager = new TradeOfferManager({
-  steam: client,
-  community: community,
-  language: 'en'
+const manager = new SteamTradeOfferManager({
+	steam: client;
+	community: community;
+	language: 'pl'
 });
 
-//Dane logowania
 const logOnOptions = {
-  accountName: 'nipmysza9100',
-  password: 'Majkelek20033002123321',
-  twoFactorCode: SteamTotp.generateAuthCode('Ur7cut0Avd2gDm5Mc1LJaFt9Pak=')
+	
+	accountName: config.username,
+	password: config.password,
+	twoFactorCode: SteamTotp.generateAuthCode(config.sharedSecret)
+	
 };
 
-//Logowanie
 client.logOn(logOnOptions);
-client.on('loggedOn', () => {
-  console.log('Poprawnie zalogowano sie na Steam');
 
-  client.setPersona(SteamUser.Steam.EPersonaState.Online/*, '[BOT] F2PReviews #1'*/);
+client.setOption("promptSteamGuardCode", false)
 
-  client.gamesPlayed('[F2PReviews] Reviewing Games...', 730, 440); //CS:GO TF2 and Custom Game
-
+client.on( 'loggedOn', () => {
+	console.log('Zalogowano na Steam!');
+	client.setPersona(SteamUser.Steam.EPersonaState.Online);
+	client.gamesPlayed(["Looking for Games Cards", 440, 570, 773240, 247120, 397720, 850990, 272060, 99900, 861560, 890930, 417860, 795100, 227300, 209120, 45760, 507010, 262930, 339190, 823130, 801160, 871720, 508550, 582160]); //440 - TF2; 730 - CS:GO; 570 - Dota 2; 10 - CS1.6 albo CS:S Nie pamietam XD
 });
 
-//Akceptowanie zaproszeń
 client.on('friendRelationship', (steamid, relationship) => {
-  if (relationship === 2) {
-      client.addFiend(steamid);
-      client.chatMessage(steamid, 'Cześć! Dzięki za dodanie mnie do znajomych!');
-      console.log('[Znajomi] Dodano nowa osobe do znajomych! SteamID: '+steamid);
-  }
+	if (relationship === 2) {
+		client.addFriend(steamid);
+		client.chatMessage(steamid, 'Cześć! Aktualnie idluję godziny w grach! Wszystkie dostępne komendy: !pomoc');
+	}
+	if (relationship === 7) {
+		client.addFriend(steamid);
+		client.chatMessage(steamid, 'Cześć! Aktualnie idluję godziny w grach! Wszystkie dostępne komendy: !pomoc');
+	}
 });
 
-//Cookies
-client.on('webSession', (sessionid, cookies) => {
-  manager.setCookies(cookies);
-
-  community.setCookies(cookies);
-
-  community.startConfirmationChecker(10000, 'A1TxyLw+jOozQTE3z6NXWfQmo4E=');
+client.on("friendMessage", function(steamid, message) {
+	if (message == "!pomoc") {
+		client.chatMessage(steamID, "<< POMOC >>");
+		client.chatMessage(steamID, " ");
+		client.chatMessage(steamID, "Wszystkie dostępne komendy:");
+		client.chatMessage(steamID, "!hourboost - Sprawdź na czym to polega!");
+		client.chatMessage(steamID, "!cennik - Sprawdź cenę za boost godzin u Ciebie!");
+		client.chatMessage(steamID, "!kontakt - Sprawdź inny kontakt ze mną!");
+		client.chatMessage(steamID, " ");
+		client.chatMessage(steamID, "<< POMOC >>");
+	}
+	if (message == "!hourboost") {
+		client.chatMessage(steamID, "<< HOUR BOOST >>");
+		client.chatMessage(steamID, " ");
+		client.chatMessage(steamID, "Hour Boost - Popoularna usługa polegająca na symulowaniu przez wirtualny komputer (tzw. VPS) uruchomionych gier, co powoduje dodawanie w nich godzin! Maksymalnie można mieć uruchomionych 31 gier :)");
+		client.chatMessage(steamID, " ");
+		client.chatMessage(steamID, "<< HOUR BOOST >>");
+	}
+	if (message == "!cennik") {
+		client.chatMessage(steamID, "<< CENNIK >>");
+		client.chatMessage(steamID, " ");
+		client.chatMessage(steamID, "Cennik moich usług możesz zobaczyć tutaj: txcboost.wix.com/home (Jeszcze nie aktywna)");
+		client.chatMessage(steamID, " ");
+		client.chatMessage(steamID, "<< CENNIK >>");
+	}
+	if (message == "!kontakt") {
+		client.chatMessage(steamID, "<< KONTAKT >>");
+		client.chatMessage(steamID, " ");
+		client.chatMessage(steamID, "Kontakt do mnie:");
+		client.chatMessage(steamID, "Facebook: facebook.com/Kornela.Michal");
+		client.chatMessage(steamID, "Mail: txcboost@gmail.com");
+		client.chatMessage(steamID, "Strona WWW: txcboost.wix.com/kontakt");
+		client.chatMessage(steamID, " ");
+		client.chatMessage(steamID, "<< KONTAKT >>");
+	}
 });
 
-//Akceptowanie ofert od "zaufanego" konta
-manager.on('newOffer', offer => {
-  if (offer.partner.getSteamID64() === '76561198800741279') {
-    offer.accept((err, status) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('[Oferta] Zaakceptowano oferte od Zaufanego Konta. Status: ${status}');
-      }
-    });
-  } else {
-    offer.decline(err => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('[Oferta] Odrzucono oferte od Scamera. Status: ${status}');
-      }
-    });
-  }
-});
-
-//Wyślij randomowy item z gry do Zaufanego konta
-function sendRandomItem() {
-  manager.loadInventory(730, 2, true, (err, inventory) => {
-    if (err) {
-      console.log(err);
-    } else {
-      const offer = manager.createOffer('76561198800741279');
-
-      const item = inventory[Math.floor(Math.random() * inventory.length - 1)];
-
-      offer.addMyItem(item);
-      offer.setMessage('Dostales ${item.name} od bota, poniewaz o to poprosiles');
-      offer.send((err, status) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log('[Random Item] Wyslano oferte. Status: ${status}');
-        }
-      });
-    }
-  });
-}
-
-//Wyślij randomowego trade 1 za 1 z gry TF2 do Zaufanego Konta
-function sendRandomTrade() {
- const partner = '76561198800741279';
- const appid = 440;
- const contextid = 2;
-
-     const offer = manager.createOffer(partner);
-      manager.loadInventory(appid, contextid, true, (err, myInv) => {
-      if (err) {
-        console.log(err);
-      } else {
-        const myItem = myInv[Math.floor(Math.random() * myInv.length - 1)];
-        offer.addMyItem(myItem);
-        manager.loadUserInventory( partner, appid, contextid, true, (err, theirInv) => {
-        if (err) {
-          console.log(err);
-        } else {
-          const theirItem = theirInv[Math.floor(Math.random() * theirInv.length - 1)];
-          offer.addTheirItem(theirItem);
-          offer.setMessage(`Czy chcialbys wymienic sie twoim ${theirItem.name} za moj ${myItem.name}?`);
-          offer.send((err, status) => {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log(`[Random Trade] Wyslano oferte. Status: ${status}`);
-            }
-          });
-        }
-      }
-    );
-  }
- });
-}
-
-/* //Akceptowanie dotacji
-manager.on('newOffer', offer => {
-  if (offer.itemsToGive.length === 0)
-  {
-    offer.accept((err, status) => {
-      if (err) {
-        console.log(err);
-      } else {
-        cosnole.log('[Dotacja] Dotacja zostala zaakceptowana. Status: ${status}')
-      }
-    });
-  } else {
-    offer.decline(err => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log{'[Dotacja] Dotacja zostala odrzucona. Powod: Proponujacy oferte uzytkownik chcial nasze przedmioty. Status: ${status}'}
-      }
-    });
-  }
-}); */
-
-//Komendy
-client.on("friendMessage", function(steamID, message) {
-  if (message == "!help") {
-    client.chatMessage(steamID, "Komendy:");
-    client.chatMessage(steamID, "!check - Sprawdź, czy bot jest online");
-    client.chatMessage(steamID, "!owner - Sprawdź mojego właściciela!");
-    console.log('[Komenda Gracza] Gracz uzyl komendy !help');
-  }
-  if (message == "!check") {
-    client.chatMessage(steamID, "[F2PReviews] BOT jest aktualnie ONLINE");
-    console.log('[Komenda Gracza] Gracz uzyl komendy !check');
-  }
-  if (message == "!adminrandomitem") {
-    client.chatMessage(steamID, "[ADMIN PANEL] Wysylam oferte z losowym przedmiotem do Zaufanego Konta!");
-    console.log('[KOMENDA ADMINA] Gracz uzyl komendy !adminrandomitem');
-    sendRandomItem();
-  }
-  if (message == "!adminrandomtrade") {
-    client.chatMessage(steamID, "[ADMIN PANEL] Wysylam losowa oferte (1 za 1) do Zaufanego Konta!");
-    console.log('[KOMENDA ADMINA] Gracz uzyl komendy !adminrandomtrade');
-    sendRandomTrade();
-  }
-  if (message == "!owner") {
-    client.chatMessage(steamID, "[F2PReviews] Moim wlascicielem jest ToxiC!");
-    client.chatMessage(steamID, "https://www.steamcommunity.com/id/SteamToxiC1337");
-    console.log('[Komenda Gracza] Gracz uzyl komendy !owner');
-  }
-});
-/*
-To do:
-
-Zapraszanie do grupy kazdego nowego znajomego
-
-*/
