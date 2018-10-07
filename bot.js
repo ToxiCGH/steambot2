@@ -9,9 +9,9 @@ const community = new SteamCommunity();
 
 const logOnOptions = {
 	
-	accountName: 'nipmysza9100',
-	password: 'Majkelek20033002123321',
-	twoFactorCode: SteamTotp.generateAuthCode('Ur7cut0Avd2gDm5Mc1LJaFt9Pak=')
+	accountName: 'n##########0',
+	password: '######################',
+	twoFactorCode: SteamTotp.generateAuthCode('Ur7cu*****2gDm5Mc*****t9Pak=')
 	
 };
 
